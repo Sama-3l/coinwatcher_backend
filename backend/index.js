@@ -1,15 +1,28 @@
+require('dotenv').config()
 const app = require('./app');
+const db = require('./config/db')
+const User = require('./model/test')
+const PORT = process.env.PORT || 3000
+
+// mongoose.set('strictQuery', async () => {
+//     try{
+//         const conn = await mongoose.connect(process.env.MONGO_URI)
+//         console.log(`Connected: ${conn.connection.host}`)
+//     }catch(e){
+//         console.log(e)
+//         process.exit(1)
+//     }
+// })
+
+
 
 const port = 3000;
-app.get('/', (req, res) => {
-    res.send('Hello World');
-})
 
-app.post('/post', (req, res) => {
-    const data = req.body;
-    console.log(data);
-    res.send('WOrked')
-});
+// app.post('/post', (req, res) => {
+//     const data = req.body;
+//     console.log(data.eachDayDb);
+//     res.send('WOrked')
+// });
 
 app.listen(port, () => {
     console.log('Server listening on Port http://localhost:' + port);
