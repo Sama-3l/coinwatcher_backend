@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const db = require('../config/db');
+const bcrypt = require('bcrypt')
 
 const { Schema } = mongoose;
 
@@ -64,6 +65,8 @@ const daySchema = new Schema({
 
 const userSchema = new Schema({
     name: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
     dailyBudget: { type: String, required: true },
     thisMonthSpent: { type: String, required: true },
     allExpenses: {
@@ -76,6 +79,23 @@ const userSchema = new Schema({
         type: [daySchema]
     }
 });
+
+userSchema.pre('save', async function(next){
+    var user = this
+    const salt = await bcrypt.genSalt(10)
+    const hashedpswd = await bcrypt.hash(user.password, salt)
+
+    user.password = hashedpswd
+})
+
+userSchema.methods.comparePswd = async function(pswd){
+    try{
+        const isMatch = await bcrypt.compare(pswd, this.password)
+        return isMatch
+    }catch(error){
+        throw error;
+    }
+}
 
 const User = db.model('users', userSchema);
 
