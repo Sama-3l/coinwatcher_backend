@@ -19,11 +19,17 @@ exports.register = async(req, res, next) => {
 exports.login = async(req, res, next) => {
     try{
         const {email, password} = req.body
-        if(await UserService.checkUserInfo(email, password)){
-            res.json({status: true, success: "Achieved"})
+        output = await UserService.checkUserInfo(email, password) 
+        if(output.match){
+
+            console.log(output.res)
+            res.json({status: true, success: "Achieved", token: output.res})
+
+
         }
         else{
-            res.json({status: true, success: "Not found"})
+            console.log(output.res)
+            res.json({status: true, success: "Not found", token: ""})
         }
     }catch(error){
         throw error;
