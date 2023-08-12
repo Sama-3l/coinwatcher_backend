@@ -30,8 +30,8 @@ class UserService {
             if (existingUser) {
                 const isMatch = await existingUser.comparePswd(password)
                 if (isMatch) {
-                    const tokenData = { _id: existingUser.name, email: existingUser.email }
-
+                    const tokenData = { _id: existingUser._id, email: existingUser.email }
+                    console.log(tokenData)
                     const token = await this.generateToken(tokenData, "Key", '365d')
                     return { match: isMatch, res: token }
                 }
