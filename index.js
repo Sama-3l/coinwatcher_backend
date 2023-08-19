@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000
 
 
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // app.post('/post', (req, res) => {
 //     const data = req.body;
