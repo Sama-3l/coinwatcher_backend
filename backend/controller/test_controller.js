@@ -2,15 +2,15 @@ const UserService = require('../services/test_services')
 
 exports.register = async(req, res, next) => {
     try {
-        console.log(req.body)
         const {name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb} = req.body
-        console.log(allExpenses)
 
         const successRes = await UserService.registerUser(name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb)
         if(successRes == false){
-            
+            res.json({status: false, success: "User Already Exists", errorcode: 1})
         }
-        res.json({status: true, success: "User Registered Successfully"})
+        else{
+            res.json({status: true, success: "User Registered Successfully", errorcode: 0})
+        }
     } catch (error) {
         throw error;
     }

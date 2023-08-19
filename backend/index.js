@@ -1,7 +1,7 @@
 require('dotenv').config()
 const app = require('./app');
 const db = require('./config/db')
-const User = require('./model/test')
+const User = require('./model/user')
 const PORT = process.env.PORT || 3000
 
 // mongoose.set('strictQuery', async () => {
