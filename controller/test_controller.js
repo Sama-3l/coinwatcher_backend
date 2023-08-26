@@ -22,13 +22,11 @@ exports.login = async (req, res, next) => {
         output = await UserService.checkUserInfo(email, password)
         if (output.match) {
 
-            console.log(output.res)
             res.json({ status: true, success: "Achieved", token: output.res })
 
 
         }
         else {
-            console.log(output.res)
             res.json({ status: true, success: "Not found", token: "" })
         }
     } catch (error) {

@@ -14,7 +14,6 @@ class UserService {
             if (!existingUser) {
                 const createUser = new User({ name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb })
                 var result = await createUser.save()
-                console.log(result)
                 this.addUsername(name)
                 const tokenData = {
                     _id: createUser._id,
