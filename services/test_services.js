@@ -14,11 +14,18 @@ class UserService {
             if (!existingUser) {
                 const createUser = new User({ name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb })
                 var result = await createUser.save()
+                console.log(result)
                 this.addUsername(name)
-                return result
+                const tokenData = {
+                    _id: createUser._id,
+                    email: email,
+                    password: password,
+                }
+                const token = await this.generateToken(tokenData, process.env.ENCRYPTION_KEY, '365d')
+                return {status: true, token: token}
             }
             else {
-                return false
+                return {status: false, token: ""}
             }
 
         } catch (err) {
@@ -42,9 +49,12 @@ class UserService {
             if (existingUser) {
                 const isMatch = await existingUser.comparePswd(password)
                 if (isMatch) {
-                    const tokenData = { _id: existingUser._id, email: existingUser.email }
-                    console.log(tokenData)
-                    const token = await this.generateToken(tokenData, process.env.ENCRYPTION_KEY, '30s')
+                    const tokenData = {
+                        _id: existingUser._id,
+                        email: email,
+                        password: password,
+                    }
+                    const token = await this.generateToken(tokenData, process.env.ENCRYPTION_KEY, '365d')
                     return { match: isMatch, res: token }
                 }
                 return { match: isMatch, res: "Token Failed" }
@@ -54,6 +64,27 @@ class UserService {
             }
         } catch (error) {
             throw error;
+        }
+    }
+
+    static async verifyUserAndGetData(email, password){
+        try {
+            const existingUser = await User.findOne({ email: email });
+            console.log(password)
+            if (existingUser) {
+                const isMatch = await existingUser.comparePswd(password)
+                if(isMatch){
+                    return existingUser
+                }
+                else{
+                    return {"error" : "Error 401"} //Unauthorized response
+                }
+            }
+            else{
+                return {"error" : "Error 404"} //User not found
+            }
+        } catch (error) {
+            
         }
     }
 
