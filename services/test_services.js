@@ -6,14 +6,14 @@ class UserService {
         this.existingUser = null;
     }
 
-    static async registerUser(name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb) {
+    static async registerUser(name, email, password, dailyBudget, allExpenses, eachMonthDb, eachDayDb) {
         try {
             const existingUser = await User.findOne({ email: email })
             const existingUsername = await User.findOne({ name: name })
 
             if (!existingUser) {
                 if (!existingUsername) {
-                    const createUser = new User({ name, email, password, dailyBudget, thisMonthSpent, allExpenses, eachMonthDb, eachDayDb })
+                    const createUser = new User({ name, email, password, dailyBudget, allExpenses, eachMonthDb, eachDayDb })
                     var result = await createUser.save()
                     const tokenData = {
                         _id: createUser._id,
@@ -99,7 +99,6 @@ class UserService {
 
     static async updateExpense(id, expense, eachMonthDb, eachDayDb) {
 
-        console.log(id)
         const userData = await User.updateOne(
             { _id: id },
             {
