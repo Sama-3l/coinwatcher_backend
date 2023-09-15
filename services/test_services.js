@@ -28,8 +28,8 @@ class UserService {
                     console.log('\n\n')
                     return { status: "200", token: token }
                 }
-                else{
-                    return {status: "400", token: ""}
+                else {
+                    return { status: "400", token: "" }
                 }
             }
             else {
@@ -97,7 +97,7 @@ class UserService {
         return userData
     }
 
-    static async updateExpense(id, expense, eachMonthDb, eachDayDb) {
+    static async addExpense(id, expense, eachMonthDb, eachDayDb) {
 
         const userData = await User.updateOne(
             { _id: id },
@@ -109,6 +109,80 @@ class UserService {
                 }
             })
         return userData
+    }
+
+    static async deleteExpense(id, expense) {
+        const req = await User.findOne({ _id: id }).then(async (user) => {
+            const foundMonth = user.eachMonthDb.find(month => {
+                const date = expense.date.split('-')
+                if (date[0] === month.date.split('-')[0] && date[1] === month.date.split('-')[1]) {
+                    var ts = parseFloat(month.totalSpent)
+                    var originalAmount = parseFloat(expense.amount)
+                    ts -= originalAmount
+                    month.totalSpent = ts.toString()
+                    month.categories.find(category => {
+                        if (category.name === expense.category) {
+                            var amount = parseFloat(category.amount)
+                            amount -= expense.amount
+                            category.amount = amount.toString()
+                        }
+                    })
+                    return month
+                }
+            })
+            await User.updateOne({ _id: user._id, 'eachMonthDb.month': foundMonth.month }, {
+                $set: { 'eachMonthDb.$.totalSpent': foundMonth.totalSpent },
+                $set: { 'eachMonthDb.$.categories': foundMonth.categories }
+            });
+        })
+
+        const expense_id = await User.findOneAndUpdate({ _id: id }, {
+            $pull: {
+                allExpenses: {
+                    name: expense.name,
+                    amount: expense.amount,
+                    date: expense.date,
+                    category: expense.category
+                }
+            }
+        })
+    }
+
+    static async updateExpense(id, originalExpense, currentExpense, allExpenses) {
+        const req = await User.findOne({ _id: id }).then(async (user) => {
+            const foundMonth = user.eachMonthDb.find(month => {
+                const date = originalExpense.date.split('-')
+                if (date[0] === month.date.split('-')[0] && date[1] === month.date.split('-')[1]) {
+                    var ts = parseFloat(month.totalSpent)
+                    var originalAmount = parseFloat(originalExpense.amount)
+                    var currentAmount = parseFloat(currentExpense.amount)
+                    ts -= originalAmount
+                    ts += currentAmount
+                    month.totalSpent = ts.toString()
+                    month.categories.find(category => {
+                        if (category.name === originalExpense.category) {
+                            var amount = parseFloat(category.amount)
+                            amount -= originalExpense.amount
+                            category.amount = amount.toString()
+                        }
+                        if (category.name === currentExpense.category) {
+                            var amount = parseFloat(category.amount)
+                            amount += parseFloat(currentExpense.amount)
+                            category.amount = amount.toString()
+                        }
+                    })
+                    return month
+                }
+            })
+            await User.updateOne({ _id: user._id, 'eachMonthDb.month': foundMonth.month }, {
+                $set: { 'eachMonthDb.$.totalSpent': foundMonth.totalSpent },
+                $set: { 'eachMonthDb.$.categories': foundMonth.categories }
+            });
+            const doc = await User.updateOne({
+                _id: user._id}, {
+                $set: { 'allExpenses': allExpenses },
+            });
+        });
     }
 }
 

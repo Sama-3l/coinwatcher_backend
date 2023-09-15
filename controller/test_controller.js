@@ -21,10 +21,7 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body
         output = await UserService.checkUserInfo(email, password)
         if (output.match) {
-
             res.json({ status: true, success: "Achieved", token: output.res })
-
-
         }
         else {
             res.json({ status: true, success: "Not found", token: "" })
@@ -54,10 +51,30 @@ exports.updateMonthlyBudget = async (req, res, next) => {
     }
 }
 
-exports.updateExpense = async (req, res, next) => {
+exports.addExpense = async (req, res, next) => {
     try {
         const { expense, data } = req.body
-        output = await UserService.updateExpense(data._id, expense, data.eachMonthDb, data.eachDayDb)
+        output = await UserService.addExpense(data._id, expense, data.eachMonthDb, data.eachDayDb)
+        res.json({ status: true, data: output })
+    } catch (error) {
+        throw error
+    }
+}
+
+exports.deleteExpense = async (req, res, next) => {
+    try {
+        const { _id, expense } = req.body
+        output = await UserService.deleteExpense(_id, expense)
+        res.json({ status: true, data: output })
+    } catch (error) {
+        throw error
+    }
+}
+
+exports.updateExpense = async (req, res, next) => {
+    try {
+        const { _id, originalExpense, currentExpense, allExpenses } = req.body
+        output = await UserService.updateExpense(_id, originalExpense, currentExpense, allExpenses)
         res.json({ status: true, data: output })
     } catch (error) {
         throw error
